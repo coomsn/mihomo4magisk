@@ -1,0 +1,167 @@
+tproxy-port: 9898
+unified-delay: true
+find-process-mode: always
+global-client-fingerprint: chrome
+allow-lan: true
+mode: rule
+log-level: debug
+ipv6: true
+geodata-mode: true
+geox-url:
+    geoip: 'https://mirror.ghproxy.com/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip-lite.dat'
+    geosite: 'https://mirror.ghproxy.com/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat'
+    mmdb: 'https://mirror.ghproxy.com/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/country-lite.mmdb'
+geo-auto-update: true
+geo-update-interval: 24
+tcp-concurrent: true
+external-controller: '0.0.0.0:9090'
+external-ui: ui
+profile:
+    store-selected: true
+    store-fake-ip: true
+sniffer:
+    enable: true
+    sniff: { TLS: { ports: [443] }, HTTP: { ports: [80], override-destination: true } }
+dns:
+    enable: true
+    listen: '0.0.0.0:1053'
+    ipv6: true
+    enhanced-mode: fake-ip
+    fake-ip-range: 28.0.0.1/8
+    fake-ip-filter: ['*', +.lan]
+    default-nameserver: [223.5.5.5, 223.6.6.6]
+    nameserver: ['tls://8.8.4.4#DNS_Proxy', 'tls://1.0.0.1#DNS_Proxy']
+    proxy-server-nameserver: ['https://dns.alidns.com/dns-query#h3=true']
+    nameserver-policy: { 'geosite:cn,private': [223.5.5.5, 223.6.6.6, 'https://dns.alidns.com/dns-query#h3=true'], 'geosite:category-ads-all': 'rcode://success' }
+proxies:     
+替换成自己的节点
+proxy-providers:
+  clash_provider:
+    type: http
+    path: ./proxy-providers/clash_provider.yaml
+    url: '替换成自己的机场'
+    interval: 3600
+    health-check:
+      enable: false
+      url: http://cp.cloudflare.com/
+      interval: 300
+proxy-groups:
+  - name: 手动切换
+    type: select
+    include-all-providers: true
+    proxies: [自动选择, nodes|ssc]
+  - name: nodes|ssc
+    type: select
+    include-all-proxies: true
+  - name: 自动选择
+    type: url-test
+    url: http://cp.cloudflare.com/
+    interval: 300
+    tolerance: 50
+    include-all-providers: true
+  - name: 全球代理
+    type: select
+    include-all-providers: true
+    proxies: [手动切换, 自动选择]
+  - name: DNS_Proxy
+    type: select
+    include-all-providers: true
+    proxies: [手动切换, 自动选择, DIRECT]
+  - name: Telegram
+    type: select
+    include-all-providers: true
+    proxies: [手动切换, 自动选择]
+  - name: Google
+    type: select
+    include-all-providers: true
+    proxies: [手动切换, 自动选择]
+  - name: YouTube
+    type: select
+    include-all-providers: true
+    proxies: [手动切换, 自动选择]
+  - name: Netflix
+    type: select
+    include-all-providers: true
+    proxies: [手动切换, 自动选择]
+  - name: Spotify
+    type: select
+    include-all-providers: true
+    proxies: [手动切换, 自动选择]
+  - name: HBO
+    type: select
+    include-all-providers: true
+    proxies: [手动切换, 自动选择]
+  - name: Bing
+    type: select
+    include-all-providers: true
+    proxies: [手动切换, 自动选择]
+  - name: OpenAI
+    type: select
+    include-all-providers: true
+    proxies: [手动切换, 自动选择]
+  - name: Disney
+    type: select
+    include-all-providers: true
+    proxies: [手动切换, 自动选择]
+  - name: GitHub
+    type: select
+    include-all-providers: true
+    proxies: [手动切换, 自动选择]
+  - name: 国内媒体
+    type: select
+    include-all-providers: true
+    proxies: [DIRECT]
+  - name: 本地直连
+    type: select
+    include-all-providers: true
+    proxies: [DIRECT]
+  - name: 漏网之鱼
+    type: select
+    include-all-providers: true
+    proxies: [DIRECT, 手动切换, 自动选择]
+rule-providers:
+    lan: { type: http, behavior: classical, url: 'https://mirror.ghproxy.com/https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Lan/Lan.yaml', path: ./rule-providers/lan.yaml, interval: 86400 }
+    reject: { type: http, behavior: domain, url: 'https://mirror.ghproxy.com/https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/reject.txt', path: ./rule-providers/reject.yaml, interval: 86400 }
+    proxy: { type: http, behavior: domain, url: 'https://mirror.ghproxy.com/https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/proxy.txt', path: ./rule-providers/proxy.yaml, interval: 86400 }
+    direct: { type: http, behavior: domain, url: 'https://mirror.ghproxy.com/https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/direct.txt', path: ./rule-providers/direct.yaml, interval: 86400 }
+    private: { type: http, behavior: domain, url: 'https://mirror.ghproxy.com/https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/private.txt', path: ./rule-providers/private.yaml, interval: 86400 }
+    gfw: { type: http, behavior: domain, url: 'https://mirror.ghproxy.com/https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/gfw.txt', path: ./rule-providers/gfw.yaml, interval: 86400 }
+    greatfire: { type: http, behavior: domain, url: 'https://mirror.ghproxy.com/https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/greatfire.txt', path: ./rule-providers/greatfire.yaml, interval: 86400 }
+    tld-not-cn: { type: http, behavior: domain, url: 'https://mirror.ghproxy.com/https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/tld-not-cn.txt', path: ./rule-providers/tld-not-cn.yaml, interval: 86400 }
+    telegramcidr: { type: http, behavior: ipcidr, url: 'https://mirror.ghproxy.com/https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/telegramcidr.txt', path: ./rule-providers/telegramcidr.yaml, interval: 86400 }
+    applications: { type: http, behavior: classical, url: 'https://mirror.ghproxy.com/https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/applications.txt', path: ./rule-providers/applications.yaml, interval: 86400 }
+    Disney: { type: http, behavior: classical, url: 'https://mirror.ghproxy.com/https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Disney/Disney.yaml', path: ./rule-providers/disney.yaml, interval: 86400 }
+    Netflix: { type: http, behavior: classical, url: 'https://mirror.ghproxy.com/https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Netflix/Netflix.yaml', path: ./rule-providers/netflix.yaml, interval: 86400 }
+    YouTube: { type: http, behavior: classical, url: 'https://mirror.ghproxy.com/https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/YouTube/YouTube.yaml', path: ./rule-providers/youtube.yaml, interval: 86400 }
+    HBO: { type: http, behavior: classical, url: 'https://mirror.ghproxy.com/https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/HBO/HBO.yaml', path: ./rule-providers/hbo.yaml, interval: 86400 }
+    OpenAI: { type: http, behavior: classical, url: 'https://mirror.ghproxy.com/https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/OpenAI/OpenAI.yaml', path: ./rule-providers/openai.yaml, interval: 86400 }
+    Bing: { type: http, behavior: classical, url: 'https://mirror.ghproxy.com/https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Bing/Bing.yaml', path: ./rule-providers/bing.yaml, interval: 86400 }
+    Google: { type: http, behavior: classical, url: 'https://mirror.ghproxy.com/https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Google/Google.yaml', path: ./rule-providers/google.yaml, interval: 86400 }
+    GitHub: { type: http, behavior: classical, url: 'https://mirror.ghproxy.com/https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/GitHub/GitHub.yaml', path: ./rule-providers/github.yaml, interval: 86400 }
+    Spotify: { type: http, behavior: classical, url: 'https://mirror.ghproxy.com/https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Spotify/Spotify.yaml', path: ./rule-providers/spotify.yaml, interval: 86400 }
+    ChinaMaxDomain: { type: http, behavior: domain, interval: 86400, url: 'https://mirror.ghproxy.com/https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/ChinaMax/ChinaMax_Domain.yaml', path: ./rule-providers/ChinaMaxDomain.yaml }
+    ChinaMaxIPNoIPv6: { type: http, behavior: ipcidr, interval: 86400, url: 'https://mirror.ghproxy.com/https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/ChinaMax/ChinaMax_IP_No_IPv6.yaml', path: ./rule-providers/ChinaMaxIPNoIPv6.yaml }
+rules:
+    - 'DOMAIN,cc1.acstudycn.eu.org,DIRECT'
+    - 'RULE-SET,YouTube,YouTube,no-resolve'
+    - 'RULE-SET,Google,Google,no-resolve'
+    - 'RULE-SET,GitHub,GitHub'
+    - 'RULE-SET,telegramcidr,Telegram,no-resolve'
+    - 'RULE-SET,Spotify,Spotify,no-resolve'
+    - 'RULE-SET,Netflix,Netflix'
+    - 'RULE-SET,HBO,HBO'
+    - 'RULE-SET,Bing,Bing'
+    - 'RULE-SET,OpenAI,OpenAI'
+    - 'RULE-SET,Disney,Disney'
+    - 'RULE-SET,proxy,全球代理'
+    - 'RULE-SET,tld-not-cn,全球代理'
+    - 'RULE-SET,gfw,全球代理'
+    - 'RULE-SET,applications,本地直连'
+    - 'RULE-SET,ChinaMaxDomain,本地直连'
+    - 'RULE-SET,ChinaMaxIPNoIPv6,本地直连,no-resolve'
+    - 'RULE-SET,lan,本地直连,no-resolve'
+    - 'RULE-SET,reject,REJECT'
+    - 'GEOSITE,category-ads-all,REJECT'
+    - 'GEOSITE,geolocation-cn,DIRECT'
+    - 'GEOIP,CN,本地直连'
+    - 'MATCH,漏网之鱼'
