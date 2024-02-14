@@ -1,0 +1,19 @@
+#!/system/bin/sh
+cd ${0%/*}
+source ./mihomo.ini
+
+events=$1
+monitor_file=$3
+
+if [ "${monitor_file}" = "disable" ]; then #1
+	if [ "${events}" = "d" ]; then #2
+		run  >/dev/null 2>&1
+	elif [ "${events}" = "n" ]; then #2
+		stop  >/dev/null 2>&1 # initialize
+	fi #2
+fi #1
+
+
+
+
+
