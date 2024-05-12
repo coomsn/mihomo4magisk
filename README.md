@@ -1,6 +1,6 @@
 # mihomo4magisk
 
-##'#!/system/bin/sh'
+## #!/system/bin/sh
   clear; cd "${0%/*}"
 ## define color
   normal=$(printf '\033[0m'); green=$(printf '\033[0;32m'); red=$(printf '\033[91m')
