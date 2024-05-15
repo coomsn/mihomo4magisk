@@ -148,8 +148,7 @@ deleteProxyRules() {
   ${3} -t mangle -X ${4}_LOCAL
   ${3} -t mangle -X ${4}_QUIC_FILTER
   ${3} -t mangle -X ${4}_DIVERT
-  local list_name=$(echo ${3} | busybox awk '{print $1}')
-  
+    
   if [[ "${3}" == *iptables* ]]; then
   # First, delete the reference chain, otherwise the custom chain cannot be deleted.
   iptables -t nat -D PREROUTING -j DNS_EXTERNAL
