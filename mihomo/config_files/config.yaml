@@ -1,0 +1,81 @@
+log-level: debug
+tproxy-port: 2653
+mode: rule
+unified-delay: true
+find-process-mode: always
+global-client-fingerprint: chrome
+allow-lan: true
+ipv6: true
+geodata-mode: true
+geox-url: 
+  geoip: 'https://mirror.ghproxy.com/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip-lite.dat'
+  geosite: 'https://mirror.ghproxy.com/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat'
+  mmdb: 'https://mirror.ghproxy.com/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/country-lite.mmdb'
+geo-auto-update: true
+geo-update-interval: 24
+tcp-concurrent: true
+external-controller: '0.0.0.0:9090'
+external-ui: webui
+profile: { store-selected: true, store-fake-ip: true }
+sniffer: { enable: true, sniff: { TLS: { ports: [443] }, HTTP: { ports: [80], override-destination: true } } }
+dns:
+  enable: true
+  listen: 0.0.0.0:2053
+  ipv6: true
+# 0只支持redir-host模式
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/15
+  fake-ip-filter:
+    - "*"
+    - "+.lan"
+    - "+.local"
+  default-nameserver:
+    - 223.5.5.5
+  nameserver:
+    - https://doh.pub/dns-query
+    - https://dns.alidns.com/dns-query
+  fallback:
+    - tls://8.8.4.4
+    - tls://1.1.1.1
+  proxy-server-nameserver:
+    - https://doh.pub/dns-query
+  nameserver-policy:
+    "+.google.cn": ["https://dns.google/dns-query#🍿proxies"]
+    "geosite:category-ads-all": rcode://success
+    "geosite:cn,private":
+      - https://doh.pub/dns-query
+      - https://dns.alidns.com/dns-query
+    "geosite:geolocation-!cn":
+      - "https://dns.cloudflare.com/dns-query#🍿proxies"
+      - "https://dns.google/dns-query#🍿proxies"
+#1机场健康检查锚点
+health: &health {type: http, interval: 3600, health-check: {enable: true, url: https://www.gstatic.com/generate_204, interval: 300}}
+#2配置文件内部的相对目录依据工作目录编译
+proxy-providers:
+  拖泥机场: { <<: *health, url: "1", path: ./providers/拖泥机场.nodes }
+  瑞特机场: { <<: *health, url: "2", path: ./providers/瑞特机场.nodes }
+  共享机场: { <<: *health, url: "3", path: ./providers/共享机场.nodes }
+proxies:  
+proxy-groups:
+  - { name: 🍿proxies, type: select, proxies: [💦共享机场, 💦拖泥机场, 💦瑞特机场, 💦wFang] }
+  - { name: 💦wFang, type: select, proxies: [oosk_a1-hy2, osg_a1-hy2] }
+  - { name: 💦共享机场, type: select, use: [共享机场]}
+  - { name: 💦拖泥机场, type: select, use: [拖泥机场]}
+  - { name: 💦瑞特机场, type: select, use: [瑞特机场]}
+  
+rules:
+ # DST-PORT,53,dns-out Must be placed first
+  - DST-PORT,53,dns-out
+  - DOMAIN-SUFFIX,eu.org,💦wFang
+  - GEOSITE,category-ads-all,REJECT 
+  - GEOSITE,openai,💦wFang
+  
+  - GEOSITE,telegram,🍿proxies
+  - GEOIP,telegram,🍿proxies
+
+  - GEOSITE,google,🍿proxies
+  - GEOSITE,geolocation-!cn,🍿proxies
+  
+  - GEOSITE,cn,DIRECT
+  - GEOIP,cn,DIRECT
+  - MATCH,DIRECT
