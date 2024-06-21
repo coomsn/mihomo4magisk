@@ -253,13 +253,14 @@ LocalBlock() {
   
   ${1} -A ${2}_LOCAL_BLOCK -p tcp -m owner --uid-owner ${box_user} --gid-owner "${box_group}" -m tcp --dport "${tp_port}" -j REJECT
   
-  if [[ "${1}" == "*iptables*" ]]; then
-    ${1} -A OUTPUT -d 127.0.0.1 -j ${2}_LOCAL_BLOCK
-  fi
-  
-  if [[ "${1}" == "*ip6tables*" ]]; then
-    ${1} -A OUTPUT -d ::1 -j ${2}_LOCAL_BLOCK
-  fi
+case "${1}" in
+  *iptables*)
+    "${1}" -A OUTPUT -d 127.0.0.1 -j "${2}_LOCAL_BLOCK"
+    ;;
+  *ip6tables*)
+    "${1}" -A OUTPUT -d ::1 -j "${2}_LOCAL_BLOCK"
+    ;;
+esac
 }
 
 # Function to execute local block setup
@@ -272,12 +273,14 @@ executeLocalBlock() {
 
 # Function to delete local block
 DeleteLocalBlock() {
-  if [[ "${1}" == "*iptables*" ]]; then  
-    ${1} -D OUTPUT -d 127.0.0.1 -j ${2}_LOCAL_BLOCK
-  fi
-  if [[ "${1}" == "*ip6tables*" ]]; then
-    ${1} -D OUTPUT -d ::1 -j ${2}_LOCAL_BLOCK
-  fi
+case "${1}" in
+  *iptables*)
+    "${1}" -D OUTPUT -d 127.0.0.1 -j "${2}_LOCAL_BLOCK"
+    ;;
+  *ip6tables*)
+    "${1}" -D OUTPUT -d ::1 -j "${2}_LOCAL_BLOCK"
+    ;;
+esac
   ${1} -F ${2}_LOCAL_BLOCK
   ${1} -X ${2}_LOCAL_BLOCK
 }
@@ -289,7 +292,3 @@ executeDeleteLocalBlock() {
     DeleteLocalBlock "${IP6V}" "${Bin##*/}6"
   fi
 }
-
-
-
-
